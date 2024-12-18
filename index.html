@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Santa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f8ff;
+            border: 1px solid #d3d3d3;
+            border-radius: 8px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Secret Santa</h1>
+        <div id="nameInputSection">
+            <p>Enter your name to join the Secret Santa:</p>
+            <input type="text" id="participantName" placeholder="Your Name">
+            <button onclick="submitName()">Submit</button>
+        </div>
+        <div id="waitingSection" class="hidden">
+            <h2>Waiting for other participants...</h2>
+            <p>Please wait until all participants have joined.</p>
+        </div>
+        <div id="resultsSection" class="hidden">
+            <h2>Your Secret Santa Assignment</h2>
+            <p id="assignment"></p>
+        </div>
+    </div>
+
+    <script>
+        const participants = [];
+        const assignments = {};
+        const totalParticipants = 5; // Set the total number of participants
+        let currentParticipant = "";
+
+        function submitName() {
+            const nameInput = document.getElementById("participantName");
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert("Please enter your name.");
+                return;
+            }
+
+            if (participants.includes(name)) {
+                alert("Name already exists. Please use a unique name.");
+                return;
+            }
+
+            currentParticipant = name;
+            participants.push(name);
+            nameInput.value = "";
+
+            if (participants.length < totalParticipants) {
+                document.getElementById("nameInputSection").classList.add("hidden");
+                document.getElementById("waitingSection").classList.remove("hidden");
+            } else {
+                document.getElementById("nameInputSection").classList.add("hidden");
+                document.getElementById("waitingSection").classList.add("hidden");
+                generateAssignments();
+            }
+        }
+
+        function generateAssignments() {
+            const shuffled = [...participants].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < participants.length; i++) {
+                const giver = participants[i];
+                const receiver = shuffled[i];
+
+                if (giver === receiver) {
+                    // Re-shuffle to avoid self-assignment
+                    return generateAssignments();
+                }
+
+                assignments[giver] = receiver;
+            }
+
+            showAssignment();
+        }
+
+        function showAssignment() {
+            const assignment = assignments[currentParticipant];
+            document.getElementById("assignment").textContent = `You will give a gift to: ${assignment}`;
+            document.getElementById("resultsSection").classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
